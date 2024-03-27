@@ -1,5 +1,6 @@
 package view;
 
+import controller.MateriaDAO;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import model.Materia;
@@ -139,7 +140,14 @@ public class TelaDeAlterarMateria extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btAtualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAtualizarActionPerformed
-        
+        if(!ctNome.getText().equals("") && !ctAreaDeConhecimento.getText().equals("") && !ctPeríodoEscolar.getText().equals("")){
+            new MateriaDAO().alterarMateria(nome, ctNome.getText(), ctAreaDeConhecimento.getText(), Integer.parseInt(ctPeríodoEscolar.getText()));
+
+            TelaDaListaDeMaterias.tela.gerarTabela();
+            
+            this.dispose();
+        }else
+            JOptionPane.showMessageDialog(rootPane, "Preencha todos os espaços");
     }//GEN-LAST:event_btAtualizarActionPerformed
 
     private void btCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCancelarActionPerformed
@@ -157,7 +165,17 @@ public class TelaDeAlterarMateria extends javax.swing.JFrame {
         ctPeríodoEscolar.setText("");
     }
     
-    public void inserirDados(){}    //Implementar função
+    public void inserirDados(){
+        for(Materia m: materias){
+            if(m.getNome().equals(nome)){
+                ctNome.setText(m.getNome());
+                ctAreaDeConhecimento.setText(m.getAreaDeConhecimento());
+                ctPeríodoEscolar.setText(Integer.toString(m.getPeriodoEscolar()));
+                
+                break;
+            }
+        }
+    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAtualizar;

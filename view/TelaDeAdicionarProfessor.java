@@ -147,7 +147,14 @@ public class TelaDeAdicionarProfessor extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSalvarActionPerformed
-        
+        if(!ctNome.getText().equals("") && !ctFormacao.getText().equals("") && !ctAreaDeAtuacao.getText().equals("") && !ctAnoDeIngresso.equals("")){
+            new ProfessorDAO().cadastrarProfessor(new Professor(ctNome.getText(), ctFormacao.getText(), ctAreaDeAtuacao.getText(), Integer.parseInt(ctAnoDeIngresso.getText())));
+
+            TelaDaListaDeProfessores.tela.gerarTabela();
+            
+            this.dispose();
+        }else
+            JOptionPane.showMessageDialog(rootPane, "Preencha todos os espaços");
     }//GEN-LAST:event_btSalvarActionPerformed
 
     private void btCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCancelarActionPerformed

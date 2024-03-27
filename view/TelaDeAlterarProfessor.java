@@ -1,5 +1,6 @@
 package view;
 
+import controller.ProfessorDAO;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import model.Professor;
@@ -152,7 +153,14 @@ public class TelaDeAlterarProfessor extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btAtualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAtualizarActionPerformed
-        
+        if(!ctNome.getText().equals("") && !ctFormacao.getText().equals("") && !ctAreaDeAtuacao.getText().equals("") && !ctAnoDeIngresso.equals("")){
+            new ProfessorDAO().alterarProfessor(nome, ctNome.getText(), ctFormacao.getText(), ctAreaDeAtuacao.getText(), Integer.parseInt(ctAnoDeIngresso.getText()));
+
+            TelaDaListaDeProfessores.tela.gerarTabela();
+            
+            this.dispose();
+        }else
+            JOptionPane.showMessageDialog(rootPane, "Preencha todos os espaços");
     }//GEN-LAST:event_btAtualizarActionPerformed
 
     private void btCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCancelarActionPerformed
@@ -171,7 +179,18 @@ public class TelaDeAlterarProfessor extends javax.swing.JFrame {
         ctAnoDeIngresso.setText("");
     }
     
-    public void inserirDados(){}    // Implementar função
+    public void inserirDados(){
+        for(Professor p: professores){
+            if(p.getNome().equals(nome)){
+                ctNome.setText(p.getNome());
+                ctFormacao.setText(p.getFormação());
+                ctAreaDeAtuacao.setText(p.getAreaDeAtuação());
+                ctAnoDeIngresso.setText(Integer.toString(p.getAnoDeIngresso()));
+                
+                break;
+            }
+        }
+    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAtualizar;

@@ -1,6 +1,9 @@
 package view;
 
+import controller.MateriaDAO;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import model.Materia;
 
 public class TelaDaListaDeMaterias extends javax.swing.JFrame {
 
@@ -163,7 +166,14 @@ public class TelaDaListaDeMaterias extends javax.swing.JFrame {
     }//GEN-LAST:event_btSairActionPerformed
 
     private void btExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btExcluirActionPerformed
-
+        String nome = JOptionPane.showInputDialog("Nome da Matéria");
+        
+        if(nome != null && new MateriaDAO().excluirMateria(nome)){
+            this.gerarTabela();
+            
+            JOptionPane.showMessageDialog(rootPane, "Matéria excluido com sucesso");
+        }else
+            JOptionPane.showMessageDialog(rootPane, "Matéria não existente");
     }//GEN-LAST:event_btExcluirActionPerformed
 
     private void btAdicionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAdicionarActionPerformed
@@ -171,10 +181,26 @@ public class TelaDaListaDeMaterias extends javax.swing.JFrame {
     }//GEN-LAST:event_btAdicionarActionPerformed
 
     private void btAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAlterarActionPerformed
-
+        String nome = JOptionPane.showInputDialog("Nome da matéria");
+        
+        if(nome != null && new MateriaDAO().materiaExiste(nome))
+            TelaDeAlterarMateria.getTela(nome, new MateriaDAO().exibirMaterias()).setVisible(true);
+        else
+            JOptionPane.showMessageDialog(rootPane, "Matéria não existente");
     }//GEN-LAST:event_btAlterarActionPerformed
 
-    
+    public void gerarTabela(){
+        int posicaoDaLinha = 0;
+        DefaultTableModel modelo = (DefaultTableModel) tblListaDeMaterias.getModel();
+        
+        modelo.setRowCount(posicaoDaLinha);
+        
+        for(Materia m: new MateriaDAO().exibirMaterias()){
+            modelo.insertRow(posicaoDaLinha, new Object []{m.getNome(), m.getAreaDeConhecimento(), m.getPeriodoEscolar()});
+            
+            posicaoDaLinha ++;
+        }
+    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAdicionar;

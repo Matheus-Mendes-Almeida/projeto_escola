@@ -1,5 +1,6 @@
 package view;
 
+import controller.AlunoDAO;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import model.Aluno;
@@ -148,7 +149,14 @@ public class TelaDeAlterarAluno extends javax.swing.JFrame {
     }//GEN-LAST:event_btCancelarActionPerformed
 
     private void btAtualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAtualizarActionPerformed
-        
+        if(!ctNome.getText().equals("") && !ctPeriodoEscolar.getText().equals("") && !ctAnoDeIngresso.getText().equals("")){
+            new AlunoDAO().alterarAluno(nome, ctNome.getText(), Integer.parseInt(ctPeriodoEscolar.getText()), Integer.parseInt(ctAnoDeIngresso.getText()));
+
+            TelaDaListaDeAlunos.tela.gerarTabela();
+            
+            this.dispose();
+        }else
+            JOptionPane.showMessageDialog(rootPane, "Preencha todos os espaços");
     }//GEN-LAST:event_btAtualizarActionPerformed
 
     public void reiniciar(){
@@ -157,7 +165,17 @@ public class TelaDeAlterarAluno extends javax.swing.JFrame {
         ctAnoDeIngresso.setText("");
     }
     
-    public void inserirDados(){}    // Implementar função
+    public void inserirDados(){
+        for(Aluno a: alunos){
+            if(a.getNome().equals(nome)){
+                ctNome.setText(a.getNome());
+                ctPeriodoEscolar.setText(Integer.toString(a.getPeriodoEscolar()));
+                ctAnoDeIngresso.setText(Integer.toString(a.getAnoDeIngresso()));
+                
+                break;
+            }
+        }
+    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAtualizar;

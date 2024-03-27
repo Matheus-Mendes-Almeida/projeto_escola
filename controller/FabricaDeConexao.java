@@ -10,7 +10,7 @@ import java.io.IOException;
 
 
 public abstract class FabricaDeConexao {
-    protected File arquivo;
+     protected File arquivo;
     protected DataInputStream lerDoArquivo;
     protected DataOutputStream escreverNoArquivo;
     protected String path;
@@ -42,6 +42,26 @@ public abstract class FabricaDeConexao {
         }
     }
     
+    public void iniciarEscritaNoArquivo(){
+        if(arquivo == null)
+            iniciarArquivo();
+        
+        try {
+            escreverNoArquivo = new DataOutputStream(new FileOutputStream(arquivo, true));
+        } catch (IOException ex) {
+        }
+    }
+    
+    public void iniciarEscritaNoArquivoNovo(){
+        if(arquivo == null)
+            iniciarArquivo();
+        
+        try {
+            escreverNoArquivo = new DataOutputStream(new FileOutputStream(arquivo, false));
+        } catch (IOException ex) {
+        }
+    }
+    
     public String lerLinha(){
         if(lerDoArquivo == null)
             iniciarLeituraDoArquivo();
@@ -52,5 +72,17 @@ public abstract class FabricaDeConexao {
         }
         
         return "Erro";
+    }
+    
+    public void inserirTexto(String texto){
+        if(escreverNoArquivo == null)
+            iniciarEscritaNoArquivo();
+        
+        try {
+            
+            escreverNoArquivo.writeUTF(texto + "\n");
+            escreverNoArquivo.flush();
+        }catch (IOException ex) {
+        }
     }
 }

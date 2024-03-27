@@ -1,6 +1,9 @@
 package view;
 
+import controller.AlunoDAO;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import model.Aluno;
 
 public class TelaDaListaDeAlunos extends javax.swing.JFrame {
 
@@ -163,7 +166,14 @@ public class TelaDaListaDeAlunos extends javax.swing.JFrame {
     }//GEN-LAST:event_btSairActionPerformed
 
     private void btExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btExcluirActionPerformed
+        String nome = JOptionPane.showInputDialog("Nome do aluno");
         
+        if(nome != null && new AlunoDAO().excluirAluno(nome)){
+            this.gerarTabela();
+            
+            JOptionPane.showMessageDialog(rootPane, "Aluno excluido com sucesso");
+        }else
+            JOptionPane.showMessageDialog(rootPane, "Aluno não existente");
     }//GEN-LAST:event_btExcluirActionPerformed
 
     private void btAdicionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAdicionarActionPerformed
@@ -171,10 +181,26 @@ public class TelaDaListaDeAlunos extends javax.swing.JFrame {
     }//GEN-LAST:event_btAdicionarActionPerformed
 
     private void btAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAlterarActionPerformed
+        String nome = JOptionPane.showInputDialog("Nome do aluno");
         
+        if(nome != null && new AlunoDAO().alunoExiste(nome)){
+            TelaDeAlterarAluno.getTela(nome, new AlunoDAO().exibirAlunos()).setVisible(true);
+        }else
+            JOptionPane.showMessageDialog(rootPane, "Aluno não existente");
     }//GEN-LAST:event_btAlterarActionPerformed
 
-       
+    public void gerarTabela(){
+        int posicaoDaLinha = 0;
+        DefaultTableModel modelo = (DefaultTableModel) tblListaDeAlunos.getModel();
+        
+        modelo.setRowCount(posicaoDaLinha);
+        
+        for(Aluno a: new AlunoDAO().exibirAlunos()){
+            modelo.insertRow(posicaoDaLinha, new Object []{a.getNome(), a.getPeriodoEscolar(), a.getAnoDeIngresso()});
+            
+            posicaoDaLinha ++;
+        }
+    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAdicionar;
