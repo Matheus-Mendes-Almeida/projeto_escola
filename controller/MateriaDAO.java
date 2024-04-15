@@ -1,113 +1,125 @@
 package controller;
 
-import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import model.Materia;
+import view.TelaInicial;
 
-public class MateriaDAO extends FabricaDeConexao{
-    @Override
-    public void gerarCaminho(){
-        path = "C:\\Documentos";
-        fileName = "Materias.bin";
-    }
-    
-    public boolean materiaExiste(String nome){
-        for(Materia m: new MateriaDAO().exibirMaterias()){
-            if(m.getNome().equals(nome))
-                
-                return true;
-        }
-        
-        return false;
-    }
+public class MateriaDAO {
     
     public void cadastrarMateria(Materia materia){
-        inserirTexto(materia.getNome());
-        inserirTexto(materia.getAreaDeConhecimento());
-        inserirTexto(Integer.toString(materia.getPeriodoEscolar()));
+        String sql = "INSERT INTO escola.materia(mate_nome, mate_areaDeConhecimento, mate_periodoEscolar) VALUES (?, ?, ?)";
+        
+        try {
+            PreparedStatement stmt = TelaInicial.conexao.prepareStatement(sql);
+            
+            stmt.setString(1,materia.getNome());
+            stmt.setString(2, materia.getAreaDeConhecimento());
+            stmt.setInt(3, materia.getPeriodoEscolar());
+            
+            if(stmt.executeUpdate() > 0) {
+		try {
+                    TelaInicial.conexao.commit();
+		} catch (SQLException e) {}
+            }
+        } catch (SQLException ex) {}
     }
     
     public ArrayList<Materia> exibirMaterias(){
         ArrayList<Materia> dados = new ArrayList<>();
         
-        iniciarLeituraDoArquivo();
-        iniciarEscritaNoArquivo();
+        String sql = "SELECT * FROM escola.materia";
+		
+	try {
+            Statement stmt = TelaInicial.conexao.createStatement();
+			
+            ResultSet resultado = stmt.executeQuery(sql);
+			
+                while(resultado.next()) {
+                    Materia m = new Materia();
+				
+                    m.setNome(resultado.getString("mate_nome"));
+                    m.setAreaDeConhecimento(resultado.getString("mate_areaDeConhecimento"));
+                    m.setPeriodoEscolar(resultado.getInt("mate_periodoEscolar"));
+				
+                    dados.add(m);
+		}
+	} catch (SQLException e) { throw new RuntimeException(e); }
         
-        try {
-            while(lerDoArquivo.available() > 0){
-                dados.add(new Materia(lerLinha().replace("\n", ""), lerLinha(), Integer.parseInt(lerLinha().replace("\n", ""))));
-            }
-        } catch (IOException ex) {
-        }
-
         return dados;
     }
     
-    public boolean alterarMateria(String nomeAntigo, String nomeNovo, String novaAreaDeConhecimento, int novoPeriodoEscolar){
-        ArrayList<Materia> intermediario;
-        
-        iniciarLeituraDoArquivo();
+    public Materia encontrarMateria(String nome){
+        String sql = "SELECT * FROM escola.materia WHERE mate_nome = ?";
+        Materia m = new Materia();
         
         try {
-            while(lerDoArquivo.available() > 0){
-                if(nomeAntigo.equals(lerLinha().replace("\n", ""))){
-                    intermediario = new MateriaDAO().exibirMaterias();
-                    
-                    for(Materia m: intermediario){
-                        if(m.getNome().equals(nomeAntigo)){
-                            m.setNome(nomeNovo);
-                            m.setAreaDeConhecimento(novaAreaDeConhecimento);
-                            m.setPeriodoEscolar(novoPeriodoEscolar);
-                            
-                            break;
-                        }
-                    }
-                    
-                    iniciarEscritaNoArquivoNovo();
-                    
-                    for(Materia m: intermediario){
-                        cadastrarMateria(m);
-                    }
-                    
-                    return true;
-                }
+            PreparedStatement stmt = TelaInicial.conexao.prepareStatement(sql);
+            
+            stmt.setString(1, nome);
+            
+            ResultSet resultado = stmt.executeQuery();
+            
+            while(resultado.next()){
+                m.setNome(resultado.getString("mate_nome"));
+                m.setAreaDeConhecimento(resultado.getString("mate_areaDeConhecimento"));
+                m.setPeriodoEscolar(resultado.getInt("mate_periodoEscolar"));
+                
+                return m;
             }
-        } catch (IOException ex) {
-        }
+        } catch (SQLException ex) {}
+    
+        return null;
+    }
+    
+    public boolean alterarMateria(String nomeAntigo, String nomeNovo, String novaAreaDeConhecimento, int novoPeriodoEscolar){
+        String sql = "UPDATE escola.materia SET mate_nome = ?, mate_areaDeConhecimento = ?, mate_periodoEscolar = ? WHERE mate_nome = ?";
         
-        return false;
+        try {
+            PreparedStatement stmt = TelaInicial.conexao.prepareStatement(sql);
+            
+            stmt.setString(1, nomeNovo);
+            stmt.setString(2, novaAreaDeConhecimento);
+            stmt.setInt(3, novoPeriodoEscolar);
+            stmt.setString(4, nomeAntigo);
+            
+            if(stmt.executeUpdate() > 0) {
+                try {
+                    TelaInicial.conexao.commit();
+                } catch (SQLException e) {}
+				
+                return true;
+            }else{
+                return false;
+            }
+            
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
     
     public boolean excluirMateria(String nome){
-        ArrayList<Materia> intermediario;
-        
-        iniciarLeituraDoArquivo();
-        
+        String sql = "DELETE FROM escola.materia WHERE mate_nome = ?";
+		
         try {
-            while(lerDoArquivo.available() > 0){
-                if(nome.equals(lerLinha().replace("\n", ""))){
-                    intermediario = new MateriaDAO().exibirMaterias();
-                    int index = 0;
-                    
-                    for(Materia m: intermediario){
-                        if(m.getNome().equals(nome))
-                            index = intermediario.indexOf(m);
-                    }
-                    
-                    intermediario.remove(index);
-                    
-                    iniciarEscritaNoArquivoNovo();
-                    
-                    for(Materia m: intermediario){
-                        cadastrarMateria(m);
-                    }
-                    
-                    return true;
-                }
+            PreparedStatement stmt = TelaInicial.conexao.prepareStatement(sql);
+			
+            stmt.setString(1, nome);
+			
+            if(stmt.executeUpdate() > 0) {
+                try {
+                    TelaInicial.conexao.commit();
+                } catch (SQLException e) {}
+				
+                return true;
+            }else{
+                return false;
             }
-        } catch (IOException ex) {
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        
-        return false;
     }
 }

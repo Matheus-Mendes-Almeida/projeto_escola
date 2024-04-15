@@ -6,6 +6,8 @@ public class Aluno {
     private int periodoEscolar;
     private int anoDeIngresso;
 
+    public Aluno() {}
+    
     public Aluno(String nome, int periodoEscolar, int anoDeingresso){
         this.nome = nome;
         this.periodoEscolar = periodoEscolar;

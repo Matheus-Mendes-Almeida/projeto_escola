@@ -7,6 +7,8 @@ public class Professor {
     private String areaDeAtuação;
     private int anoDeIngresso;
 
+    public Professor() {}
+    
     public Professor(String nome, String formação, String areaDeAtuação, int anoDeIngresso) {
         this.nome = nome;
         this.formação = formação;

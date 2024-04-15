@@ -1,8 +1,8 @@
 package view;
 
-import controller.AlunoDAO;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import controller.AlunoDAO;
 import model.Aluno;
 
 public class TelaDaListaDeAlunos extends javax.swing.JFrame {
@@ -16,6 +16,9 @@ public class TelaDaListaDeAlunos extends javax.swing.JFrame {
     public static TelaDaListaDeAlunos getTela() {
         if(tela == null)
             tela = new TelaDaListaDeAlunos();
+        
+        
+        tela.gerarTabela();
         
         return tela;
     }
@@ -166,6 +169,7 @@ public class TelaDaListaDeAlunos extends javax.swing.JFrame {
     }//GEN-LAST:event_btSairActionPerformed
 
     private void btExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btExcluirActionPerformed
+
         String nome = JOptionPane.showInputDialog("Nome do aluno");
         
         if(nome != null && new AlunoDAO().excluirAluno(nome)){
@@ -182,9 +186,10 @@ public class TelaDaListaDeAlunos extends javax.swing.JFrame {
 
     private void btAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAlterarActionPerformed
         String nome = JOptionPane.showInputDialog("Nome do aluno");
+        Aluno alunoExiste = new AlunoDAO().encontrarAluno(nome);
         
-        if(nome != null && new AlunoDAO().alunoExiste(nome)){
-            TelaDeAlterarAluno.getTela(nome, new AlunoDAO().exibirAlunos()).setVisible(true);
+        if(nome != null && alunoExiste != null){
+            TelaDeAlterarAluno.getTela(nome, alunoExiste).setVisible(true);
         }else
             JOptionPane.showMessageDialog(rootPane, "Aluno não existente");
     }//GEN-LAST:event_btAlterarActionPerformed

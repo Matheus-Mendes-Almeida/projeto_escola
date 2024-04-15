@@ -1,8 +1,8 @@
 package view;
 
-import controller.ProfessorDAO;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import controller.ProfessorDAO;
 import model.Professor;
 
 public class TelaDaListaDeProfessores extends javax.swing.JFrame {
@@ -16,7 +16,10 @@ public class TelaDaListaDeProfessores extends javax.swing.JFrame {
     public static TelaDaListaDeProfessores getTela() {
         if(tela == null)
             tela = new TelaDaListaDeProfessores();
-
+        
+        
+        tela.gerarTabela();
+        
         return tela;
     }
 
@@ -167,6 +170,7 @@ public class TelaDaListaDeProfessores extends javax.swing.JFrame {
     }//GEN-LAST:event_btSairActionPerformed
 
     private void btExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btExcluirActionPerformed
+        
        String nome = JOptionPane.showInputDialog("Nome do aluno");
         
         if(nome != null && new ProfessorDAO().excluirProfessor(nome)){
@@ -183,9 +187,10 @@ public class TelaDaListaDeProfessores extends javax.swing.JFrame {
 
     private void btAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAlterarActionPerformed
         String nome = JOptionPane.showInputDialog("Nome do Professor");
+        Professor professorExiste = new ProfessorDAO().encontrarProfessor(nome);
         
-        if(nome != null && new ProfessorDAO().professorExiste(nome)){
-            TelaDeAlterarProfessor.getTela(nome, new ProfessorDAO().exibirProfessor()).setVisible(true);
+        if(nome != null && professorExiste != null){
+            TelaDeAlterarProfessor.getTela(nome, professorExiste).setVisible(true);
         }else
             JOptionPane.showMessageDialog(rootPane, "Professor não existente");
     }//GEN-LAST:event_btAlterarActionPerformed

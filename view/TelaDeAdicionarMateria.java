@@ -36,7 +36,7 @@ public class TelaDeAdicionarMateria extends javax.swing.JFrame {
         txtPeríodoEscolar = new javax.swing.JLabel();
         ctPeríodoEscolar = new javax.swing.JTextField();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         btCancelar.setText("Cancelar");
         btCancelar.addActionListener(new java.awt.event.ActionListener() {

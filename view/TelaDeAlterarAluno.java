@@ -1,26 +1,25 @@
 package view;
 
 import controller.AlunoDAO;
-import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import model.Aluno;
 
 public class TelaDeAlterarAluno extends javax.swing.JFrame {
 
     public static TelaDeAlterarAluno tela;
-    private ArrayList<Aluno> alunos;
+    private Aluno aluno;
     private String nome;
     
     public TelaDeAlterarAluno() {
         initComponents();
     }
     
-    public static TelaDeAlterarAluno getTela(String nome, ArrayList<Aluno> alunos) {
+    public static TelaDeAlterarAluno getTela(String nome, Aluno aluno) {
         if(tela == null)
             tela = new TelaDeAlterarAluno();
         
-        tela.alunos = alunos;
         tela.nome = nome;
+        tela.aluno = aluno;
         
         tela.inserirDados();
         
@@ -42,7 +41,7 @@ public class TelaDeAlterarAluno extends javax.swing.JFrame {
         txtAnoDeIngresso = new javax.swing.JLabel();
         ctAnoDeIngresso = new javax.swing.JTextField();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         btCancelar.setText("Cancelar");
         btCancelar.addActionListener(new java.awt.event.ActionListener() {
@@ -166,15 +165,9 @@ public class TelaDeAlterarAluno extends javax.swing.JFrame {
     }
     
     public void inserirDados(){
-        for(Aluno a: alunos){
-            if(a.getNome().equals(nome)){
-                ctNome.setText(a.getNome());
-                ctPeriodoEscolar.setText(Integer.toString(a.getPeriodoEscolar()));
-                ctAnoDeIngresso.setText(Integer.toString(a.getAnoDeIngresso()));
-                
-                break;
-            }
-        }
+        ctNome.setText(aluno.getNome());
+        ctPeriodoEscolar.setText(Integer.toString(aluno.getPeriodoEscolar()));
+        ctAnoDeIngresso.setText(Integer.toString(aluno.getAnoDeIngresso()));
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

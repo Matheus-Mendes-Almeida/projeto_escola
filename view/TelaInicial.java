@@ -1,7 +1,11 @@
 package view;
 
-public class TelaInicial extends javax.swing.JFrame {
+import java.sql.Connection;
+import controller.FabricaDeConexao;
 
+public class TelaInicial extends javax.swing.JFrame {
+    public static Connection conexao;
+    
     public TelaInicial() {
         initComponents();
     }
@@ -134,6 +138,9 @@ public class TelaInicial extends javax.swing.JFrame {
         }
         //</editor-fold>
 
+        FabricaDeConexao f = FabricaDeConexao.getconexao();
+        conexao = f.getConexaoRoot();
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {

@@ -1,114 +1,125 @@
 package controller;
 
-import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import model.Aluno;
+import view.TelaInicial;
 
-public class AlunoDAO extends FabricaDeConexao{
-    @Override
-    public void gerarCaminho(){
-       path = "C:\\Documentos";
-       fileName = "Alunos.bin";
-    }
-    
-    public boolean alunoExiste(String nome){
-        for(Aluno a: new AlunoDAO().exibirAlunos()){
-            if(a.getNome().equals(nome))
-                
-                return true;
-        }
-        
-        return false;
-    }
+public class AlunoDAO {
     
     public void cadastrarAluno(Aluno aluno){
-        inserirTexto(aluno.getNome());
-        inserirTexto(Integer.toString(aluno.getPeriodoEscolar()));
-        inserirTexto(Integer.toString(aluno.getAnoDeIngresso()));
+        String sql = "INSERT INTO escola.aluno(alu_nome, alu_periodoEscolar, alu_anoDeIngresso) VALUES (?, ?, ?)";
+        
+        try {
+            PreparedStatement stmt = TelaInicial.conexao.prepareStatement(sql);
+            
+            stmt.setString(1, aluno.getNome());
+            stmt.setInt(2, aluno.getPeriodoEscolar());
+            stmt.setInt(3, aluno.getAnoDeIngresso());
+            
+            if(stmt.executeUpdate() > 0) {
+		try {
+                    TelaInicial.conexao.commit();
+		} catch (SQLException e) {}
+            }
+        } catch (SQLException ex) {}
     }
     
     public ArrayList<Aluno> exibirAlunos(){
         ArrayList<Aluno> dados = new ArrayList<>();
         
-        iniciarLeituraDoArquivo();
-        iniciarEscritaNoArquivo();
+        String sql = "SELECT * FROM escola.aluno";
+		
+	try {
+            Statement stmt = TelaInicial.conexao.createStatement();
+			
+            ResultSet resultado = stmt.executeQuery(sql);
+			
+                while(resultado.next()) {
+                    Aluno a = new Aluno();
+				
+                    a.setNome(resultado.getString("alu_nome"));
+                    a.setPeriodoEscolar(resultado.getInt("alu_periodoEscolar"));
+                    a.setAnoDeIngresso(resultado.getInt("alu_anoDeIngresso"));
+				
+                    dados.add(a);
+		}
+	} catch (SQLException e) { throw new RuntimeException(e); }
         
-        try {
-            while(lerDoArquivo.available() > 0){
-                dados.add(new Aluno(lerLinha().replace("\n", ""), Integer.parseInt(lerLinha().replace("\n", "")), Integer.parseInt(lerLinha().replace("\n", ""))));
-            }
-        } catch (IOException ex) {
-        }
-
         return dados;
     }
     
-    public boolean alterarAluno(String nomeAntigo, String nomeNovo, int novoPeriodoEscolar, int anoDeIngresso){
-        ArrayList<Aluno> intermediario;
-        
-        iniciarLeituraDoArquivo();
+    public Aluno encontrarAluno(String nome){
+        String sql = "SELECT * FROM escola.aluno WHERE alu_nome = ?";
+        Aluno a = new Aluno();
         
         try {
-            while(lerDoArquivo.available() > 0){
-                String inter = lerLinha().replace("\n", "");
-                if(nomeAntigo.equals(inter)){
-                    intermediario = new AlunoDAO().exibirAlunos();
-                    
-                    for(Aluno a: intermediario){
-                        if(a.getNome().equals(nomeAntigo)){
-                            a.setNome(nomeNovo);
-                            a.setPeriodoEscolar(novoPeriodoEscolar);
-                            a.setAnoDeIngresso(anoDeIngresso);
-                            
-                            break;
-                        }
-                    }
-                    
-                    iniciarEscritaNoArquivoNovo();
-                    
-                    for(Aluno a: intermediario){
-                        cadastrarAluno(a);
-                    }
-                    
-                    return true;
-                }
+            PreparedStatement stmt = TelaInicial.conexao.prepareStatement(sql);
+            
+            stmt.setString(1, nome);
+            
+            ResultSet resultado = stmt.executeQuery();
+            
+            while(resultado.next()){
+                a.setNome(resultado.getString("alu_nome"));
+                a.setPeriodoEscolar(resultado.getInt("alu_periodoEscolar"));
+                a.setAnoDeIngresso(resultado.getInt("alu_anoDeIngresso"));
+                
+                return a;
             }
-        } catch (IOException ex) {
-        }
+        } catch (SQLException ex) {}
+    
+        return null;
+    }
+    
+    public boolean alterarAluno(String nomeAntigo, String nomeNovo, int novoPeriodoEscolar, int novoAnoDeIngresso){
+        String sql = "UPDATE escola.aluno SET alu_nome = ?, alu_periodoEscolar = ?, alu_anoDeIngresso = ? WHERE alu_nome = ?";
         
-        return false;
+        try {
+            PreparedStatement stmt = TelaInicial.conexao.prepareStatement(sql);
+            
+            stmt.setString(1, nomeNovo);
+            stmt.setInt(2, novoPeriodoEscolar);
+            stmt.setInt(3, novoAnoDeIngresso);
+            stmt.setString(4, nomeAntigo);
+            
+            if(stmt.executeUpdate() > 0) {
+                try {
+                    TelaInicial.conexao.commit();
+                } catch (SQLException e) {}
+				
+                return true;
+            }else{
+                return false;
+            }
+            
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
    
     public boolean excluirAluno(String nome){
-        ArrayList<Aluno> intermediario;
-        
-        iniciarLeituraDoArquivo();
-        
+        String sql = "DELETE FROM escola.aluno WHERE alu_nome = ?";
+		
         try {
-            while(lerDoArquivo.available() > 0){                
-                if(nome.equals(lerLinha().replace("\n", ""))){
-                    intermediario = new AlunoDAO().exibirAlunos();
-                    int index = 0;
-                    
-                    for(Aluno a: intermediario){
-                        if(a.getNome().equals(nome))
-                            index = intermediario.indexOf(a);
-                    }
-                    
-                    intermediario.remove(index);
-                    
-                    iniciarEscritaNoArquivoNovo();
-                    
-                    for(Aluno a: intermediario){
-                        cadastrarAluno(a);
-                    }
-                    
-                    return true;
-                }
+            PreparedStatement stmt = TelaInicial.conexao.prepareStatement(sql);
+			
+            stmt.setString(1, nome);
+			
+            if(stmt.executeUpdate() > 0) {
+                try {
+                    TelaInicial.conexao.commit();
+                } catch (SQLException e) {}
+				
+                return true;
+            }else{
+                return false;
             }
-        } catch (IOException ex) {
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        
-        return false;
     }
 }

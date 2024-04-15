@@ -1,25 +1,24 @@
 package view;
 
 import controller.ProfessorDAO;
-import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import model.Professor;
 
 public class TelaDeAlterarProfessor extends javax.swing.JFrame {
 
     public static TelaDeAlterarProfessor tela;
-    private ArrayList<Professor> professores;
+    private Professor professor;
     private String nome;
     
     public TelaDeAlterarProfessor() {
         initComponents();
     }
     
-    public static TelaDeAlterarProfessor getTela(String nome, ArrayList<Professor> professores) {
+    public static TelaDeAlterarProfessor getTela(String nome, Professor professor) {
         if(tela == null)
             tela = new TelaDeAlterarProfessor();
         
-        tela.professores = professores;
+        tela.professor = professor;
         tela.nome = nome;
                 
         tela.inserirDados();
@@ -44,7 +43,7 @@ public class TelaDeAlterarProfessor extends javax.swing.JFrame {
         txtPeríodoEscolar1 = new javax.swing.JLabel();
         ctAnoDeIngresso = new javax.swing.JTextField();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         btCancelar.setText("Cancelar");
         btCancelar.addActionListener(new java.awt.event.ActionListener() {
@@ -180,16 +179,10 @@ public class TelaDeAlterarProfessor extends javax.swing.JFrame {
     }
     
     public void inserirDados(){
-        for(Professor p: professores){
-            if(p.getNome().equals(nome)){
-                ctNome.setText(p.getNome());
-                ctFormacao.setText(p.getFormação());
-                ctAreaDeAtuacao.setText(p.getAreaDeAtuação());
-                ctAnoDeIngresso.setText(Integer.toString(p.getAnoDeIngresso()));
-                
-                break;
-            }
-        }
+        ctNome.setText(professor.getNome());
+        ctFormacao.setText(professor.getFormação());
+        ctAreaDeAtuacao.setText(professor.getAreaDeAtuação());
+        ctAnoDeIngresso.setText(Integer.toString(professor.getAnoDeIngresso()));
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -1,8 +1,8 @@
 package view;
 
-import controller.MateriaDAO;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import controller.MateriaDAO;
 import model.Materia;
 
 public class TelaDaListaDeMaterias extends javax.swing.JFrame {
@@ -16,6 +16,9 @@ public class TelaDaListaDeMaterias extends javax.swing.JFrame {
     public static TelaDaListaDeMaterias getTela() {
         if(tela == null)
             tela = new TelaDaListaDeMaterias();
+        
+        
+        tela.gerarTabela();
         
         return tela;
     }
@@ -166,7 +169,8 @@ public class TelaDaListaDeMaterias extends javax.swing.JFrame {
     }//GEN-LAST:event_btSairActionPerformed
 
     private void btExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btExcluirActionPerformed
-        String nome = JOptionPane.showInputDialog("Nome da Matéria");
+        
+      String nome = JOptionPane.showInputDialog("Nome da Matéria");
         
         if(nome != null && new MateriaDAO().excluirMateria(nome)){
             this.gerarTabela();
@@ -182,9 +186,10 @@ public class TelaDaListaDeMaterias extends javax.swing.JFrame {
 
     private void btAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAlterarActionPerformed
         String nome = JOptionPane.showInputDialog("Nome da matéria");
+        Materia materiaExiste = new MateriaDAO().encontrarMateria(nome);
         
-        if(nome != null && new MateriaDAO().materiaExiste(nome))
-            TelaDeAlterarMateria.getTela(nome, new MateriaDAO().exibirMaterias()).setVisible(true);
+        if(nome != null && materiaExiste != null)
+            TelaDeAlterarMateria.getTela(nome, materiaExiste).setVisible(true);
         else
             JOptionPane.showMessageDialog(rootPane, "Matéria não existente");
     }//GEN-LAST:event_btAlterarActionPerformed

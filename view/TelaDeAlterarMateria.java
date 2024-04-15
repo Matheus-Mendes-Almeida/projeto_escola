@@ -1,25 +1,24 @@
 package view;
 
 import controller.MateriaDAO;
-import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import model.Materia;
 
 public class TelaDeAlterarMateria extends javax.swing.JFrame {
 
     public static TelaDeAlterarMateria tela;
-    private ArrayList<Materia> materias;
+    private Materia materia;
     private String nome;
     
     public TelaDeAlterarMateria() {
         initComponents();
     }
     
-    public static TelaDeAlterarMateria getTela(String nome, ArrayList<Materia> materias) {
+    public static TelaDeAlterarMateria getTela(String nome, Materia materia) {
         if(tela == null)
             tela = new TelaDeAlterarMateria();
         
-        tela.materias = materias;
+        tela.materia = materia;
         tela.nome = nome;
         
         tela.inserirDados();
@@ -42,7 +41,7 @@ public class TelaDeAlterarMateria extends javax.swing.JFrame {
         txtPeríodoEscolar = new javax.swing.JLabel();
         ctPeríodoEscolar = new javax.swing.JTextField();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         btCancelar.setText("Cancelar");
         btCancelar.addActionListener(new java.awt.event.ActionListener() {
@@ -166,15 +165,9 @@ public class TelaDeAlterarMateria extends javax.swing.JFrame {
     }
     
     public void inserirDados(){
-        for(Materia m: materias){
-            if(m.getNome().equals(nome)){
-                ctNome.setText(m.getNome());
-                ctAreaDeConhecimento.setText(m.getAreaDeConhecimento());
-                ctPeríodoEscolar.setText(Integer.toString(m.getPeriodoEscolar()));
-                
-                break;
-            }
-        }
+        ctNome.setText(materia.getNome());
+        ctAreaDeConhecimento.setText(materia.getAreaDeConhecimento());
+        ctPeríodoEscolar.setText(Integer.toString(materia.getPeriodoEscolar()));
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

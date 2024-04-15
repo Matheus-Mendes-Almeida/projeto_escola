@@ -6,6 +6,8 @@ public class Materia {
     private String areaDeConhecimento;
     private int periodoEscolar;
 
+    public Materia() {}
+    
     public Materia(String nome, String areaDeConhecimento, int periodoEscolar) {
         this.nome = nome;
         this.areaDeConhecimento = areaDeConhecimento;

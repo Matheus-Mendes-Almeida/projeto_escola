@@ -1,115 +1,129 @@
 package controller;
 
-import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import model.Professor;
+import view.TelaInicial;
 
-public class ProfessorDAO extends FabricaDeConexao{
-    @Override
-    public void gerarCaminho(){
-        path = "C:\\Documentos";
-        fileName = "Professores.bin";
-    }
-    
-    public boolean professorExiste(String nome){
-        for(Professor p: new ProfessorDAO().exibirProfessor()){
-            if(p.getNome().equals(nome))
-                
-                return true;
-        }
-        
-        return false;
-    }
+public class ProfessorDAO {
     
     public void cadastrarProfessor(Professor professor){
-        inserirTexto(professor.getNome());
-        inserirTexto(professor.getFormação());
-        inserirTexto(professor.getAreaDeAtuação());
-        inserirTexto(Integer.toString(professor.getAnoDeIngresso()));
+        String sql = "INSERT INTO escola.professor(prof_nome, prof_formacao, prof_areaDeAtuacao, prof_anoDeIngresso) VALUES (?, ?, ?, ?)";
+        
+        try {
+            PreparedStatement stmt = TelaInicial.conexao.prepareStatement(sql);
+            
+            stmt.setString(1,professor.getNome());
+            stmt.setString(2, professor.getFormação());
+            stmt.setString(3, professor.getAreaDeAtuação());
+            stmt.setInt(4, professor.getAnoDeIngresso());
+            
+            if(stmt.executeUpdate() > 0) {
+		try {
+                    TelaInicial.conexao.commit();
+		} catch (SQLException e) {}
+            }
+        } catch (SQLException ex) {}
     }
     
     public ArrayList<Professor> exibirProfessor(){
         ArrayList<Professor> dados = new ArrayList<>();
         
-        iniciarLeituraDoArquivo();
-        iniciarEscritaNoArquivo();
+         String sql = "SELECT * FROM escola.professor";
+		
+	try {
+            Statement stmt = TelaInicial.conexao.createStatement();
+			
+            ResultSet resultado = stmt.executeQuery(sql);
+			
+                while(resultado.next()) {
+                    Professor p = new Professor();
+				
+                    p.setNome(resultado.getString("prof_nome"));
+                    p.setFormação(resultado.getString("prof_formacao"));
+                    p.setAreaDeAtuação(resultado.getString("prof_areaDeAtuacao"));
+                    p.setAnoDeIngresso(resultado.getInt("prof_anoDeIngresso"));
+				
+                    dados.add(p);
+		}
+	} catch (SQLException e) { throw new RuntimeException(e); }
         
-        try {
-            while(lerDoArquivo.available() > 0){
-                dados.add(new Professor(lerLinha().replace("\n", ""), lerLinha(), lerLinha(),Integer.parseInt(lerLinha().replace("\n", ""))));
-            }
-        } catch (IOException ex) {
-        }
-
         return dados;
     }
     
-    public boolean alterarProfessor(String nomeAntigo, String nomeNovo, String novaFormacao, String novaAreaDeAtuacao, int anoDeIngresso){
-        ArrayList<Professor> intermediario;
-        
-        iniciarLeituraDoArquivo();
+    public Professor encontrarProfessor(String nome){
+        String sql = "SELECT * FROM escola.professor WHERE prof_nome = ?";
+        Professor p = new Professor();
         
         try {
-            while(lerDoArquivo.available() > 0){
-                if(nomeAntigo.equals(lerLinha().replace("\n", ""))){
-                    intermediario = new ProfessorDAO().exibirProfessor();
-                    
-                    for(Professor p: intermediario){
-                        if(p.getNome().equals(nomeAntigo)){
-                            p.setNome(nomeNovo);
-                            p.setFormação(novaFormacao);
-                            p.setAreaDeAtuação(novaAreaDeAtuacao);
-                            p.setAnoDeIngresso(anoDeIngresso);
-                            
-                            break;
-                        }
-                    }
-                    
-                    iniciarEscritaNoArquivoNovo();
-                    
-                    for(Professor p: intermediario){
-                        cadastrarProfessor(p);
-                    }
-                    
-                    return true;
-                }
+            PreparedStatement stmt = TelaInicial.conexao.prepareStatement(sql);
+            
+            stmt.setString(1, nome);
+            
+            ResultSet resultado = stmt.executeQuery();
+            
+            while(resultado.next()){
+                p.setNome(resultado.getString("prof_nome"));
+                p.setFormação(resultado.getString("prof_formacao"));
+                p.setAreaDeAtuação(resultado.getString("prof_areaDeAtuacao"));
+                p.setAnoDeIngresso(resultado.getInt("prof_anoDeIngresso"));
+                
+                return p;
             }
-        } catch (IOException ex) {
-        }
+        } catch (SQLException ex) {}
+    
+        return null;
+    }
+    
+    public boolean alterarProfessor(String nomeAntigo, String nomeNovo, String novaFormacao, String novaAreaDeAtuacao, int novoAnoDeIngresso){
+        String sql = "UPDATE escola.professor SET prof_nome = ?, prof_formacao = ?, prof_areaDeAtuacao = ?, prof_anoDeIngresso = ? WHERE prof_nome = ?";
         
-        return false;
+        try {
+            PreparedStatement stmt = TelaInicial.conexao.prepareStatement(sql);
+            
+            stmt.setString(1, nomeNovo);
+            stmt.setString(2, novaFormacao);
+            stmt.setString(3, novaAreaDeAtuacao);
+            stmt.setInt(4, novoAnoDeIngresso);
+            stmt.setString(5, nomeAntigo);
+            
+            if(stmt.executeUpdate() > 0) {
+                try {
+                    TelaInicial.conexao.commit();
+                } catch (SQLException e) {}
+				
+                return true;
+            }else{
+                return false;
+            }
+            
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
     
     public boolean excluirProfessor(String nome){
-        ArrayList<Professor> intermediario;
-        
-        iniciarLeituraDoArquivo();
-        
+        String sql = "DELETE FROM escola.professor WHERE prof_nome = ?";
+		
         try {
-            while(lerDoArquivo.available() > 0){
-                if(nome.equals(lerLinha().replace("\n", ""))){
-                    intermediario = new ProfessorDAO().exibirProfessor();
-                    int index = 0;
-                    
-                    for(Professor p: intermediario){
-                        if(p.getNome().equals(nome))
-                            index = intermediario.indexOf(p);
-                    }
-                    
-                    intermediario.remove(index);
-                    
-                    iniciarEscritaNoArquivoNovo();
-                    
-                    for(Professor p: intermediario){
-                        cadastrarProfessor(p);
-                    }
-                    
-                    return true;
-                }
+            PreparedStatement stmt = TelaInicial.conexao.prepareStatement(sql);
+			
+            stmt.setString(1, nome);
+			
+            if(stmt.executeUpdate() > 0) {
+                try {
+                    TelaInicial.conexao.commit();
+                } catch (SQLException e) {}
+				
+                return true;
+            }else{
+                return false;
             }
-        } catch (IOException ex) {
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        
-        return false;
     }
 }

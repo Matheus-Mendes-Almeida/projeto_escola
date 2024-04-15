@@ -36,7 +36,7 @@ public class TelaDeAdicionarAluno extends javax.swing.JFrame {
         txtAnoDeIngresso = new javax.swing.JLabel();
         ctAnoDeIngresso = new javax.swing.JTextField();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         btCancelar.setText("Cancelar");
         btCancelar.addActionListener(new java.awt.event.ActionListener() {
